@@ -1,107 +1,154 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class menu {
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Game Menu");
-        frame.setSize(400, 300);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+public class menu extends JFrame {
 
-        JPanel panel = new JPanel(new BorderLayout());
+    public menu() {
+        setTitle("Menú del Juego");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setMinimumSize(new Dimension(800, 800));
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
-        // Fondo del panel principal
-        ImageIcon background = new ImageIcon("background.jpg");
-        JLabel backgroundLabel = new JLabel(background);
-        panel.add(backgroundLabel, BorderLayout.CENTER);
-        panel.setOpaque(true);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(new Color(30, 30, 30)); // Fondo gris oscuro
 
-        // Creamos el panel para los botones con un borde vacío
-        JPanel buttonPanel = new JPanel(new GridLayout(3, 1, 0, 20));
-        buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+        // Panel para los botones con un título encima
+        JPanel buttonsPanel = new JPanel(new GridBagLayout());
+        buttonsPanel.setBackground(new Color(30, 30, 30)); // Fondo gris oscuro
+        buttonsPanel.setBorder(BorderFactory.createEmptyBorder(100, 175, 100, 100)); // Añadir un margen interno más amplio
 
-        // Cargamos las fuentes personalizadas
-        Font buttonFont = loadFont("YourFont.ttf").deriveFont(Font.PLAIN, 16f);
+        // Configuración del título "PANDEMIC" encima de los botones
+        JLabel titleLabel = new JLabel("PANDEMIC");
+        titleLabel.setForeground(Color.WHITE); // Texto blanco
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28)); // Fuente y tamaño
+        buttonsPanel.add(titleLabel);
 
-        // Creamos los botones con los iconos y estilo personalizado
-        JButton startButton = createStyledButton("Start Game", "start_icon.png", buttonFont);
-        startButton.addActionListener(new ActionListener() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1; // Comenzamos desde la segunda fila para los botones
+        gbc.insets = new Insets(20, 20, 20, 20); // Espaciado interior de los botones
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Rellenar horizontalmente
+
+        JButton nuevaPartidaBtn = new JButton("Nueva partida");
+        estilizarBoton(nuevaPartidaBtn);
+        nuevaPartidaBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                // Aquí colocarías el código para iniciar el juego
-                JOptionPane.showMessageDialog(frame, "Starting the game!");
+                JOptionPane.showMessageDialog(null, "Iniciar nueva partida...");
             }
         });
+        buttonsPanel.add(nuevaPartidaBtn, gbc);
 
-        JButton optionsButton = createStyledButton("Options", "options_icon.png", buttonFont);
-        optionsButton.addActionListener(new ActionListener() {
+        gbc.gridy++;
+        JButton cargarPartidaBtn = new JButton("Cargar partida");
+        estilizarBoton(cargarPartidaBtn);
+        cargarPartidaBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                // Aquí colocarías el código para abrir las opciones del juego
-                JOptionPane.showMessageDialog(frame, "Opening options menu!");
+                JOptionPane.showMessageDialog(null, "Cargar partida guardada...");
             }
         });
+        buttonsPanel.add(cargarPartidaBtn, gbc);
 
-        JButton exitButton = createStyledButton("Exit", "exit_icon.png", buttonFont);
-        exitButton.addActionListener(new ActionListener() {
+        gbc.gridy++;
+        JButton informacionBtn = new JButton("Información");
+        estilizarBoton(informacionBtn);
+        informacionBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                // Aquí colocarías el código para salir del juego
+                mostrarInformacion();
+            }
+        });
+        buttonsPanel.add(informacionBtn, gbc);
+
+        gbc.gridy++;
+        JButton resumenPuntuacionesBtn = new JButton("Resumen de puntuaciones");
+        estilizarBoton(resumenPuntuacionesBtn);
+        resumenPuntuacionesBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Mostrar resumen de puntuaciones...");
+            }
+        });
+        buttonsPanel.add(resumenPuntuacionesBtn, gbc);
+
+        gbc.gridy++;
+        JButton autoresBtn = new JButton("Autores");
+        estilizarBoton(autoresBtn);
+        autoresBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarAutores();
+            }
+        });
+        buttonsPanel.add(autoresBtn, gbc);
+
+        gbc.gridy++;
+        JButton versionBtn = new JButton("Versión");
+        estilizarBoton(versionBtn);
+        versionBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Versión 1.0");
+            }
+        });
+        buttonsPanel.add(versionBtn, gbc);
+
+        gbc.gridy++;
+        JButton salirBtn = new JButton("Salir");
+        estilizarBoton(salirBtn);
+        salirBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }
         });
+        buttonsPanel.add(salirBtn, gbc);
 
-        // Añadimos los botones al panel
-        buttonPanel.add(startButton);
-        buttonPanel.add(optionsButton);
-        buttonPanel.add(exitButton, BorderLayout.SOUTH);
+        mainPanel.add(buttonsPanel, BorderLayout.WEST);
 
-        // Añadimos el panel de botones al centro del panel principal
-        panel.add(buttonPanel, BorderLayout.CENTER);
+        ImageIcon icon = new ImageIcon("/D:/Diego.C/Pandemic/Pandemic/Pandemic/imagenmenu.jpg"); // Cambia "ruta/a/la/imagen.jpg" por la ruta de tu imagen
+        Image image = icon.getImage().getScaledInstance(1200, -1, Image.SCALE_SMOOTH); // -1 mantiene la relación de aspecto
+        icon = new ImageIcon(image);
+        JLabel imageLabel = new JLabel(icon);
+        mainPanel.add(imageLabel, BorderLayout.CENTER);
 
-        // Añadimos el panel principal al frame
-        frame.add(panel);
-        frame.setVisible(true);
+        add(mainPanel);
+        setVisible(true);
     }
 
-    // Método para crear un botón con estilo personalizado
-    private static JButton createStyledButton(String text, String iconFilename, Font font) {
-        JButton button = new JButton(text, new ImageIcon(iconFilename));
-        button.setHorizontalTextPosition(SwingConstants.CENTER);
-        button.setVerticalTextPosition(SwingConstants.BOTTOM);
-        button.setFont(font);
-        button.setForeground(Color.WHITE);
-        button.setBackground(new Color(40, 40, 40));
-        button.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(70, 70, 70), 2),
-                BorderFactory.createEmptyBorder(10, 20, 10, 20)
-        ));
-        button.setFocusPainted(false);
-        button.setContentAreaFilled(false);
-        button.setOpaque(true);
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(60, 60, 60));
-            }
+    private void mostrarInformacion() {
+        JOptionPane.showMessageDialog(null, "Objetivo del juego:\r\n"
+        		+ "El objetivo del juego es investigar y producir vacunas para todas las enfermedades presentes en el mapa antes de que se produzca un número determinado de brotes.\r\n"
+        		+ "Preparación del juego:\r\n"
+        		+ "Selecciona la dificultad del juego, que determinará la cantidad inicial de ciudades infectadas y el número de brotes necesarios para perder el juego.\r\n"
+        		+ "Turno de juego:\r\n"
+        		+ "En cada turno, el jugador puede realizar una de las siguientes acciones:\r\n"
+        		+ "Investigar vacuna: El jugador puede elegir una enfermedad presente y realizar la investigación correspondiente, aumentando el porcentaje de investigacion de esta en un 25%.\r\n"
+        		+ "Curar ciudad: El jugador puede elegir una ciudad con una enfermedad y eliminar la enfermedad de esa ciudad.\r\n"
+        		+ "Fin del juego:\r\n"
+        		+ "El juego termina si se produce un número determinado de brotes antes de que se investiguen todas las vacunas. En ese caso, el jugador pierde.\r\nSi el jugador investiga vacunas para todas las enfermedades antes de que se produzca el número de brotes establecido, gana el juego.");
+    }
 
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(40, 40, 40));
+    private void mostrarAutores() {
+        JOptionPane.showMessageDialog(null, "Autores:\nDiego Castillo Colea\nDavid Juan Antunez");
+    }
+
+    private void estilizarBoton(JButton button) {
+        button.setBackground(new Color(50, 205, 50)); // Verde
+        button.setForeground(Color.WHITE); // Texto blanco
+        button.setFocusPainted(false); // Quitar efecto de enfoque
+        button.setPreferredSize(new Dimension(240, 60)); // Tamaño fijo para los botones
+        button.setFont(new Font("Arial", Font.PLAIN, 18)); // Tamaño de fuente
+    }
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new menu().setVisible(true);
             }
         });
-        return button;
-    }
-
-    // Método para cargar una fuente personalizada
-    private static Font loadFont(String filename) {
-        Font font = null;
-        try {
-            font = Font.createFont(Font.TRUETYPE_FONT, menu.class.getResourceAsStream(filename));
-        } catch (FontFormatException | IOException e) {
-            e.printStackTrace();
-            // En caso de error, se usa una fuente predeterminada
-            font = new Font("Arial", Font.PLAIN, 16);
-        }
-        return font;
     }
 }
-
