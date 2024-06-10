@@ -105,6 +105,9 @@ public class PantallaJuego extends JFrame {
         Image vacunaRojaOriginal = vacunaRojaIcon.getImage();
         Image vacunaRojaScaled = vacunaRojaOriginal.getScaledInstance(150, -1, Image.SCALE_SMOOTH);
         JButton botonVacunaRoja = new JButton(new ImageIcon(vacunaRojaScaled));
+        botonVacunaRoja.setContentAreaFilled(false);
+        botonVacunaRoja.setBorderPainted(false);
+        botonVacunaRoja.setOpaque(false);
         JLabel labelPorcentajeRojo = new JLabel("0%");
         botonVacunaRoja.addActionListener(e -> {
             int porcentajeActual = Integer.parseInt(labelPorcentajeRojo.getText().replace("%", ""));
@@ -142,6 +145,9 @@ public class PantallaJuego extends JFrame {
         Image vacunaAzulOriginal = vacunaAzulIcon.getImage();
         Image vacunaAzulScaled = vacunaAzulOriginal.getScaledInstance(150, -1, Image.SCALE_SMOOTH);
         JButton botonVacunaAzul = new JButton(new ImageIcon(vacunaAzulScaled));
+        botonVacunaAzul.setContentAreaFilled(false);
+        botonVacunaAzul.setBorderPainted(false);
+        botonVacunaAzul.setOpaque(false);
         JLabel labelPorcentajeAzul = new JLabel("0%");
         botonVacunaAzul.addActionListener(e -> {
             int porcentajeActual = Integer.parseInt(labelPorcentajeAzul.getText().replace("%", ""));
@@ -179,6 +185,9 @@ public class PantallaJuego extends JFrame {
         Image vacunaAmarillaOriginal = vacunaAmarillaIcon.getImage();
         Image vacunaAmarillaScaled = vacunaAmarillaOriginal.getScaledInstance(150, -1, Image.SCALE_SMOOTH);
         JButton botonVacunaAmarilla = new JButton(new ImageIcon(vacunaAmarillaScaled));
+        botonVacunaAmarilla.setContentAreaFilled(false);
+        botonVacunaAmarilla.setBorderPainted(false);
+        botonVacunaAmarilla.setOpaque(false);
         JLabel labelPorcentajeAmarilla = new JLabel("0%");
         botonVacunaAmarilla.addActionListener(e -> {
             int porcentajeActual = Integer.parseInt(labelPorcentajeAmarilla.getText().replace("%", ""));
@@ -216,6 +225,9 @@ public class PantallaJuego extends JFrame {
         Image vacunaVerdeOriginal = vacunaVerdeIcon.getImage();
         Image vacunaVerdeScaled = vacunaVerdeOriginal.getScaledInstance(150, -1, Image.SCALE_SMOOTH);
         JButton botonVacunaVerde = new JButton(new ImageIcon(vacunaVerdeScaled));
+        botonVacunaVerde.setContentAreaFilled(false);
+        botonVacunaVerde.setBorderPainted(false);
+        botonVacunaVerde.setOpaque(false);
         JLabel labelPorcentajeVerde = new JLabel("0%");
         botonVacunaVerde.addActionListener(e -> {
             int porcentajeActual = Integer.parseInt(labelPorcentajeVerde.getText().replace("%", ""));
@@ -251,6 +263,9 @@ public class PantallaJuego extends JFrame {
         
      // Botones de Curar
         JButton botonCurar = new JButton("Curar");
+        botonCurar.setContentAreaFilled(false);
+        botonCurar.setBorderPainted(false);
+        botonCurar.setOpaque(false);
         
         botonCurar.addActionListener(e -> {
             // Verificar si hay una ciudad seleccionada y si hay acciones disponibles
