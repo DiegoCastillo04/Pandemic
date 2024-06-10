@@ -14,7 +14,9 @@ import java.util.Scanner;
 
 public class parametros {
     private static final String PARAMS_FILE = "parametros.xml";
-
+    public static int numCiudadesInfectadasInicio;
+    public static int numCuidadesInfectadasRonda;
+    
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -34,10 +36,10 @@ public class parametros {
             // Procesar la opción seleccionada
             switch (option) {
                 case 1:
-                	LeerYPrintear(); // Leer y mostrar datos del archivo XML
+                    LeerYPrintear(); // Leer y mostrar datos del archivo XML
                     break;
                 case 2:
-                	ActualizarParametros(); // Actualizar datos en el archivo XML
+                    ActualizarParametros(); // Actualizar datos en el archivo XML
                     break;
                 case 3:
                     System.out.println("Ya estas fuera"); // Salir del programa
@@ -50,7 +52,7 @@ public class parametros {
     }
 
     // Método para leer y mostrar datos del archivo XML
-    private static void LeerYPrintear() {
+    public static void LeerYPrintear() {
         try {
             File inputFile = new File(PARAMS_FILE);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -74,6 +76,16 @@ public class parametros {
                         System.out.println(nombre + ": " + valor);
                     }
                 }
+
+                // Convertir y mostrar los valores como enteros
+                System.out.println("\n--- DATOS CONVERTIDOS ---");
+              numCiudadesInfectadasInicio = Integer.parseInt(getElementValue(doc, "numCiudadesInfectadasInicio"));
+              numCuidadesInfectadasRonda = Integer.parseInt(getElementValue(doc, "numCuidadesInfectadasRonda"));
+
+
+                System.out.println("numCiudadesInfectadasInicio: " + numCiudadesInfectadasInicio);
+                System.out.println("numCuidadesInfectadasRonda: " + numCuidadesInfectadasRonda);
+
             }
         } catch (Exception e) {
             System.out.println("Error al leer el archivo " + PARAMS_FILE);
@@ -81,29 +93,37 @@ public class parametros {
         }
     }
 
-    // Método para actualizar datos en el archivo XML
-    private static void ActualizarParametros() {
-        try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            Document doc = docBuilder.newDocument();
+    // Método auxiliar para obtener el valor de un elemento XML
+    private static String getElementValue(Document doc, String tagName) {
+        NodeList nodeList = doc.getElementsByTagName(tagName);
+        if (nodeList.getLength() > 0) {
+            Node node = nodeList.item(0);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                return node.getTextContent();
+            }
+        }
+        return "";
+    }
 
-            // Crear el elemento raíz del archivo XML
-            Element rootElement = doc.createElement("parametros");
-            doc.appendChild(rootElement);
+    // Método para actualizar datos en el archivo XML
+    public static void ActualizarParametros() {
+        try {
+            File inputFile = new File(PARAMS_FILE);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(inputFile);
+            doc.getDocumentElement().normalize();
 
             Scanner scanner = new Scanner(System.in);
 
             // Definir los nombres de los parámetros
-            String[] paramNames = {"numCiudadesInfectadasInicio", "numCuidadesInfectadasRonda", "numEnfermedadesActivasDerrota", "numBrotesDerrota"};
+            String[] paramNames = {"numCiudadesInfectadasInicio", "numCuidadesInfectadasRonda"};
 
             // Solicitar al usuario que ingrese nuevos valores para los parámetros
             for (String paramName : paramNames) {
-                Element parametro = doc.createElement(paramName);
                 System.out.print("Dime el nuevo valor para " + paramName + ": ");
                 String nuevoValor = scanner.nextLine();
-                parametro.appendChild(doc.createTextNode(nuevoValor));
-                rootElement.appendChild(parametro);
+                updateElementValue(doc, paramName, nuevoValor);
             }
 
             // Escribir los cambios en el archivo XML
@@ -117,6 +137,15 @@ public class parametros {
         } catch (Exception e) {
             System.out.println("Error al guardar");
             e.printStackTrace();
+        }
+    }
+
+    // Método auxiliar para actualizar el valor de un elemento XML
+    private static void updateElementValue(Document doc, String tagName, String newValue) {
+        NodeList nodeList = doc.getElementsByTagName(tagName);
+        if (nodeList.getLength() > 0) {
+            Element element = (Element) nodeList.item(0);
+            element.setTextContent(newValue);
         }
     }
 }

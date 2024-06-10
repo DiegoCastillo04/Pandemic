@@ -37,7 +37,9 @@ public class menu extends JFrame {
         nuevaPartidaBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Iniciar nueva partida...");
+                // Crear y mostrar la pantalla del juego
+                PantallaJuego pantallaJuego = new PantallaJuego();
+                pantallaJuego.setVisible(true);
             }
         });
         buttonsPanel.add(nuevaPartidaBtn, gbc);
@@ -65,14 +67,54 @@ public class menu extends JFrame {
         buttonsPanel.add(informacionBtn, gbc);
 
         gbc.gridy++;
-        JButton resumenPuntuacionesBtn = new JButton("Resumen de puntuaciones");
+        JButton resumenPuntuacionesBtn = new JButton("Ranking");
         estilizarBoton(resumenPuntuacionesBtn);
         resumenPuntuacionesBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "Mostrar resumen de puntuaciones...");
+                // Obtener el tamaño de la pantalla
+                GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+                int screenWidth = gd.getDisplayMode().getWidth();
+                int screenHeight = gd.getDisplayMode().getHeight();
+
+                // Tamaño de la imagen
+                int imageWidth = (int) (screenWidth * 0.8);
+                int imageHeight = (int) (screenHeight * 0.8);
+
+                // Cargar la imagen
+                ImageIcon rankingImage = new ImageIcon("Ranking.png"); // Asegúrate de tener el archivo Ranking.png en la ubicación adecuada
+
+                // Escalar la imagen al tamaño deseado
+                Image scaledImage = rankingImage.getImage().getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
+                ImageIcon scaledIcon = new ImageIcon(scaledImage);
+
+                // Crear un diálogo
+                JDialog dialog = new JDialog();
+                dialog.setTitle("Resumen de Puntuaciones");
+                dialog.setSize(imageWidth, imageHeight);
+
+                // Añadir la imagen al JLabel
+                JLabel imageLabel = new JLabel(scaledIcon);
+
+                // Añadir el JLabel al diálogo
+                dialog.add(imageLabel);
+
+                // Cerrar el diálogo cuando se haga clic fuera de él
+                dialog.setModal(true);
+
+                // Calcular la posición para centrar el diálogo en la pantalla
+                int dialogX = (screenWidth - imageWidth) / 2;
+                int dialogY = (screenHeight - imageHeight) / 2;
+                dialog.setLocation(dialogX, dialogY);
+
+                // Mostrar el diálogo
+                dialog.setVisible(true);
             }
         });
+
+
+
+
         buttonsPanel.add(resumenPuntuacionesBtn, gbc);
 
         gbc.gridy++;
@@ -110,7 +152,7 @@ public class menu extends JFrame {
 
         mainPanel.add(buttonsPanel, BorderLayout.WEST);
 
-        ImageIcon icon = new ImageIcon("/D:/Diego.C/Pandemic/Pandemic/Pandemic/imagenmenu.jpg"); // Cambia "ruta/a/la/imagen.jpg" por la ruta de tu imagen
+        ImageIcon icon = new ImageIcon("imagenmenu.jpg"); // Cambia "ruta/a/la/imagen.jpg" por la ruta de tu imagen
         Image image = icon.getImage().getScaledInstance(1200, -1, Image.SCALE_SMOOTH); // -1 mantiene la relación de aspecto
         icon = new ImageIcon(image);
         JLabel imageLabel = new JLabel(icon);

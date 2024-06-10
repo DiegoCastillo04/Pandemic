@@ -74,14 +74,12 @@ public class txtCiudades {
     private static void imprimirCiudadesConDistancias() {
         int count = 1; // Para numerar las ciudades
         for (Ciudades ciudad : listaCiudades) {
-                       System.out.println("La ciudad " + ciudad.getNombreciudad() + " está en las coordenadas " + ciudad.getCoords()[0] + "," + ciudad.getCoords()[1] + " sus ciudades colindantes son:");
-                       frases.add("La ciudad " + ciudad.getNombreciudad() + " está en las coordenadas " + ciudad.getCoords()[0] + "," + ciudad.getCoords()[1] + " sus ciudades colindantes son:");
+                      
             for (String colindante : ciudad.getColindantes()) {
                 Ciudades colindanteCiudad = obtenerCiudad(colindante);
                 if (colindanteCiudad != null) {
                     double distancia = ciudad.pitagoras(colindanteCiudad);
-                    System.out.println(colindanteCiudad.getNombreciudad() + ", que está a una distancia de " + distancia + "km\"");
-                    frases.add(colindanteCiudad.getNombreciudad() + ", que está a una distancia de " + distancia + "km\"");
+                  
                 }
             }
             count++;
@@ -96,4 +94,23 @@ public class txtCiudades {
         }
         return null;
     }
+    
+    public static ArrayList<Ciudades> crearArrayCiudades() {
+    	
+    	main(null);
+    	
+    	
+		return listaCiudades;
+    	 	
+		
+	}
+    
+    
+  
+    
+    
+    
+    
+    
+    
 }

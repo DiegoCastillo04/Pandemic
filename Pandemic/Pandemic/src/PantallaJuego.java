@@ -1,213 +1,479 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
 
 public class PantallaJuego extends JFrame {
+ ArrayList<Ciudades> ciudadesArraylist = new ArrayList<>();
+ ArrayList<Vacunas> vacunasArraylist = new ArrayList<>();
+ ArrayList<JButton> botonesCiudades = new ArrayList<>();
+  public static int acciones = 4;
+  public static int turnos = 1;
+  public static int brotes = 0;
+  public static JButton ciudadSeleccionado;
 
-    private int puntosDeAccion = 4; // Contador de puntos de acción
-    private JLabel pointsLabel; // Etiqueta para mostrar el contador de puntos de acción
-    private int turnos = 1; // Contador de turnos
-    private boolean investigando = false; // Indicador de si se está investigando una vacuna
-
-    // Porcentajes iniciales de las vacunas
-    private int porcentajeVacuna1 = 0;
-    private int porcentajeVacuna2 = 0;
-    private int porcentajeVacuna3 = 0;
-    private int porcentajeVacuna4 = 0;
-
+  
     public PantallaJuego() {
-        setTitle("Pandemic - Juego");
-        setSize(1920, 1080); // Establecer el tamaño de la ventana
+        setTitle("Mapa");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setUndecorated(true); // Elimina la barra de título y los bordes de la ventana
 
-        // Crear un JLayeredPane para superponer componentes
-        JLayeredPane layeredPane = new JLayeredPane();
-        setContentPane(layeredPane);
+        // Obtener el tamaño de la pantalla
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int screenWidth = (int) screenSize.getWidth();
+        int screenHeight = (int) screenSize.getHeight();
+        setSize(screenWidth, screenHeight); // Establecer el tamaño del marco para que coincida con el tamaño de la pantalla
 
-        // Calcular el tamaño del margen superior para centrar verticalmente el mapa
-        int marginTop = (1080 - 780) / 2;
-
-        // Agregar un espacio vacío en la parte superior para crear el margen
-        JPanel topMarginPanel = new JPanel();
-        topMarginPanel.setPreferredSize(new Dimension(1920, marginTop)); // Altura del margen
-        layeredPane.add(topMarginPanel, new Integer(0));
-
-        // Cargar la imagen de fondo
-        ImageIcon backgroundImage = new ImageIcon("D:/Diego.C/Pandemic/Pandemic/Pandemic/mapa_mundo.png"); // Ruta de la imagen
-        JLabel backgroundLabel = new JLabel(backgroundImage);
-        // Centrar el mapa horizontalmente
-        int x = (1920 - backgroundImage.getIconWidth()) / 2;
-        backgroundLabel.setBounds(x, marginTop, backgroundImage.getIconWidth(), backgroundImage.getIconHeight());
-        layeredPane.add(backgroundLabel, new Integer(1));
-
-        // Crear panel para los botones en la parte derecha
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(0, 1, 0, 5)); // Organizar los botones verticalmente con espacio entre ellos
-
-        // Crear botones para vacunas
-        JButton vaccineButton1 = new JButton("V1 (" + porcentajeVacuna1 + "%)");
-        JButton vaccineButton2 = new JButton("V2 (" + porcentajeVacuna2 + "%)");
-        JButton vaccineButton3 = new JButton("V3 (" + porcentajeVacuna3 + "%)");
-        JButton vaccineButton4 = new JButton("V4 (" + porcentajeVacuna4 + "%)");
-
-        // Crear botones para investigación y curación
-        JButton researchButton = new JButton("Investigación");
-        JButton cureButton = new JButton("Curación");
-
-        // Ajustar el tamaño de los botones y la fuente
-        Dimension buttonSize = new Dimension(80, 30); // Reducir el tamaño de los botones
-        Font buttonFont = new Font("Arial", Font.PLAIN, 12); // Ajustar la fuente
-        vaccineButton1.setPreferredSize(buttonSize);
-        vaccineButton2.setPreferredSize(buttonSize);
-        vaccineButton3.setPreferredSize(buttonSize);
-        vaccineButton4.setPreferredSize(buttonSize);
-        researchButton.setPreferredSize(buttonSize);
-        cureButton.setPreferredSize(buttonSize);
-        vaccineButton1.setFont(buttonFont);
-        vaccineButton2.setFont(buttonFont);
-        vaccineButton3.setFont(buttonFont);
-        vaccineButton4.setFont(buttonFont);
-        researchButton.setFont(buttonFont);
-        cureButton.setFont(buttonFont);
-
-        // ActionListener para los botones de investigación de vacunas
-        ActionListener researchListener = new ActionListener() {
+        // Panel central con imagen del mapa mundi
+        JPanel panelCentral = new JPanel() {
+        	
+        	
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (puntosDeAccion > 0) {
-                    investigando = true; // Indicar que se está investigando
-                }
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                ImageIcon mapaMundi = new ImageIcon("mapa_mundo.png");
+                Image mapaOriginal = mapaMundi.getImage();
+                g.drawImage(mapaOriginal, 0, 0, getWidth(), getHeight(), this);
             }
         };
+       
+        panelCentral.setLayout(null);
+        
 
-        // ActionListener para los botones de vacunas
-        ActionListener vaccineListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (investigando && puntosDeAccion > 0) {
-                    JButton button = (JButton) e.getSource();
-                    String buttonText = button.getText();
-                    int porcentajeActual = 0;
-                    if (buttonText.startsWith("V1")) {
-                        porcentajeActual = porcentajeVacuna1;
-                        porcentajeVacuna1 = Math.min(porcentajeActual + 25, 100); // Incrementar hasta un máximo de 100%
-                        button.setText("V1 (" + porcentajeVacuna1 + "%)");
-                    } else if (buttonText.startsWith("V2")) {
-                        porcentajeActual = porcentajeVacuna2;
-                        porcentajeVacuna2 = Math.min(porcentajeActual + 25, 100);
-                        button.setText("V2 (" + porcentajeVacuna2 + "%)");
-                    } else if (buttonText.startsWith("V3")) {
-                        porcentajeActual = porcentajeVacuna3;
-                        porcentajeVacuna3 = Math.min(porcentajeActual + 25, 100);
-                        button.setText("V3 (" + porcentajeVacuna3 + "%)");
-                    } else if (buttonText.startsWith("V4")) {
-                        porcentajeActual = porcentajeVacuna4;
-                        porcentajeVacuna4 = Math.min(porcentajeActual + 25, 100);
-                        button.setText("V4 (" + porcentajeVacuna4 + "%)");
+
+        // Obtener el tamaño de la imagen del mapa
+        ImageIcon mapaMundi = new ImageIcon("mapa_mundo.png");
+        int mapaWidth = mapaMundi.getIconWidth();
+        int mapaHeight = mapaMundi.getIconHeight();
+        panelCentral.setPreferredSize(new Dimension(mapaWidth, mapaHeight)); // Tamaño del panel central
+
+        // Panel izquierdo con 4 botones y porcentaje de vacuna
+        JPanel panelIzquierdo = new JPanel();
+        panelIzquierdo.setPreferredSize(new Dimension(200, mapaHeight)); // Tamaño del panel izquierdo
+        
+        // Panel derecho con contadores y botón de finalizar turno
+        JPanel panelDerecho = new JPanel();
+        panelDerecho.setPreferredSize(new Dimension(180, mapaHeight)); // Tamaño del panel derecho
+        panelDerecho.setLayout(new GridLayout(7, 1));
+        JLabel labelBrotes = new JLabel("Brotes: 0");
+        JLabel labelAcciones = new JLabel("Acciones: " + acciones);
+        JLabel labelTurnos = new JLabel("Turnos: 1");
+        JLabel labelCiudadSelec = new JLabel("Ciudad Seleccionada: Ninguna");
+        JLabel labelInfeccionCiudad = new JLabel("Infeccion Ciudad: Ninguna");
+        JButton botonFinalizarTurno = new JButton("Finalizar Turno");
+        botonFinalizarTurno.addActionListener(e -> {
+            turnos += 1;
+            labelTurnos.setText("Turnos: " + turnos);
+            nuevoTurno();
+            acciones = 4;
+            labelAcciones.setText("Acciones: " + acciones);
+
+            // Propagar la infección a las ciudades colindantes al finalizar el turno
+            for (Ciudades ciudad : ciudadesArraylist) {
+                ciudad.propagarInfeccion(ciudadesArraylist);
+            }
+
+            // Verificar si todas las ciudades están infectadas al finalizar el turno
+            boolean todasCiudadesInfectadas = true;
+            for (Ciudades ciudad : ciudadesArraylist) {
+                if (ciudad.getInfeccion() < 3) {
+                    todasCiudadesInfectadas = false;
+                    break;
+                }
+            }
+            if (todasCiudadesInfectadas) {
+                JOptionPane.showMessageDialog(this, "Todas las ciudades están completamente infectadas. ¡Has perdido!");
+                dispose(); // Cerrar la pantalla de juego actual
+                PantallaPerdedor pantallaPerdedor = new PantallaPerdedor();
+                pantallaPerdedor.setVisible(true);
+            }
+        });
+        
+        panelDerecho.add(new JLabel()); // Espacio en blanco
+        panelDerecho.add(labelBrotes);
+        panelDerecho.add(labelAcciones);
+        panelDerecho.add(labelTurnos);
+        panelDerecho.add(labelCiudadSelec);
+        panelDerecho.add(labelInfeccionCiudad);
+        panelDerecho.add(botonFinalizarTurno);
+        
+        
+        
+        // Botón Vacuna Roja
+        ImageIcon vacunaRojaIcon = new ImageIcon("vacuna1.png");
+        Image vacunaRojaOriginal = vacunaRojaIcon.getImage();
+        Image vacunaRojaScaled = vacunaRojaOriginal.getScaledInstance(150, -1, Image.SCALE_SMOOTH);
+        JButton botonVacunaRoja = new JButton(new ImageIcon(vacunaRojaScaled));
+        JLabel labelPorcentajeRojo = new JLabel("0%");
+        botonVacunaRoja.addActionListener(e -> {
+            int porcentajeActual = Integer.parseInt(labelPorcentajeRojo.getText().replace("%", ""));
+            if (porcentajeActual < 100 && acciones >= 4) {
+                int nuevoPorcentaje = porcentajeActual + 25;
+                if (nuevoPorcentaje > 100) {
+                    nuevoPorcentaje = 100;
+                }
+                vacunasArraylist.get(0).setPorcentage(nuevoPorcentaje);
+                acciones = 0; // Gastar todas las acciones
+                labelAcciones.setText("Acciones: " + acciones);
+                labelPorcentajeRojo.setText(nuevoPorcentaje + "%");
+
+                // Verificar si todas las vacunas están al 100%
+                boolean todasVacunasCompletas = true;
+                for (Vacunas vacuna : vacunasArraylist) {
+                    if (vacuna.getPorcentage() < 100) {
+                        todasVacunasCompletas = false;
+                        break;
                     }
-
-                    // Descontar un punto de acción
-                    puntosDeAccion--;
-                    updatePointsLabel(); // Actualizar la etiqueta de puntos de acción
-                    investigando = false; // Desactivar la investigación
+                }
+                if (todasVacunasCompletas) {
+         
+                    dispose(); // Cerrar la ventana actual
+                    PantallaGanador pantallaGanador = new PantallaGanador();
+                    pantallaGanador.setVisible(true);
                 }
             }
-        };
+        });
+        panelIzquierdo.add(botonVacunaRoja);
+        panelIzquierdo.add(labelPorcentajeRojo);
 
-        // Agregar ActionListeners a los botones de investigación y de vacunas
-        researchButton.addActionListener(researchListener);
-        vaccineButton1.addActionListener(vaccineListener);
-        vaccineButton2.addActionListener(vaccineListener);
-        vaccineButton3.addActionListener(vaccineListener);
-        vaccineButton4.addActionListener(vaccineListener);
+        // Botón Vacuna Azul
+        ImageIcon vacunaAzulIcon = new ImageIcon("vacuna2.png");
+        Image vacunaAzulOriginal = vacunaAzulIcon.getImage();
+        Image vacunaAzulScaled = vacunaAzulOriginal.getScaledInstance(150, -1, Image.SCALE_SMOOTH);
+        JButton botonVacunaAzul = new JButton(new ImageIcon(vacunaAzulScaled));
+        JLabel labelPorcentajeAzul = new JLabel("0%");
+        botonVacunaAzul.addActionListener(e -> {
+            int porcentajeActual = Integer.parseInt(labelPorcentajeAzul.getText().replace("%", ""));
+            if (porcentajeActual < 100 && acciones >= 4) {
+                int nuevoPorcentaje = porcentajeActual + 25;
+                if (nuevoPorcentaje > 100) {
+                    nuevoPorcentaje = 100;
+                }
+                vacunasArraylist.get(1).setPorcentage(nuevoPorcentaje);
+                acciones = 0; // Gastar todas las acciones
+                labelAcciones.setText("Acciones: " + acciones);
+                labelPorcentajeAzul.setText(nuevoPorcentaje + "%");
 
-        // Agregar botones al panel
-        buttonPanel.add(vaccineButton1);
-        buttonPanel.add(vaccineButton2);
-        buttonPanel.add(vaccineButton3);
-        buttonPanel.add(vaccineButton4);
-        // Agregar espacio entre los botones de vacuna y los botones de investigación y curación
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Espacio entre los botones de vacuna y los de investigación/curación
-        buttonPanel.add(researchButton);
-        buttonPanel.add(cureButton);
-
-        // Establecer posición y tamaño del panel de botones
-        int buttonPanelWidth = 100; // Ancho del panel de botones
-        int marginRight = 50; // Margen a la derecha
-        int buttonPanelX = 1920 - buttonPanelWidth - marginRight; // Posición X del panel de botones (en el borde derecho con margen)
-        buttonPanel.setBounds(buttonPanelX, marginTop, buttonPanelWidth, 780); // El mismo margen superior que el mapa
-
-        // Agregar el panel de botones a la capa superior del JLayeredPane
-        layeredPane.add(buttonPanel, new Integer(2));
-
-        // Botón para cerrar la ventana
-        JButton closeButton = new JButton("X");
-        closeButton.setPreferredSize(new Dimension(30, 30));
-        closeButton.setFont(new Font("Arial", Font.BOLD, 14));
-        closeButton.setForeground(Color.RED);
-        closeButton.setBackground(Color.WHITE);
-        closeButton.setFocusPainted(false);
-        closeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dispose(); // Cierra la ventana
+                // Verificar si todas las vacunas están al 100%
+                boolean todasVacunasCompletas = true;
+                for (Vacunas vacuna : vacunasArraylist) {
+                    if (vacuna.getPorcentage() < 100) {
+                        todasVacunasCompletas = false;
+                        break;
+                    }
+                }
+                if (todasVacunasCompletas) {
+                  
+                    dispose(); // Cerrar la ventana actual
+                    PantallaGanador pantallaGanador = new PantallaGanador();
+                    pantallaGanador.setVisible(true);
+                }
             }
         });
-        closeButton.setBounds(1890, 10, 30, 30); // Posición del botón en la esquina superior derecha
-        layeredPane.add(closeButton, new Integer(3));
+        panelIzquierdo.add(botonVacunaAzul);
+        panelIzquierdo.add(labelPorcentajeAzul);
 
-        // Etiqueta para mostrar el contador de puntos de acción
-        pointsLabel = new JLabel("Puntos de Acción: " + puntosDeAccion);
-        pointsLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        pointsLabel.setForeground(Color.BLACK); // Cambiar color a negro
-        pointsLabel.setBounds(10, 1040, 150, 30); // Posición de la etiqueta en la esquina inferior izquierda
-        layeredPane.add(pointsLabel, new Integer(4));
+        // Botón Vacuna Amarilla
+        ImageIcon vacunaAmarillaIcon = new ImageIcon("vacuna3.png");
+        Image vacunaAmarillaOriginal = vacunaAmarillaIcon.getImage();
+        Image vacunaAmarillaScaled = vacunaAmarillaOriginal.getScaledInstance(150, -1, Image.SCALE_SMOOTH);
+        JButton botonVacunaAmarilla = new JButton(new ImageIcon(vacunaAmarillaScaled));
+        JLabel labelPorcentajeAmarilla = new JLabel("0%");
+        botonVacunaAmarilla.addActionListener(e -> {
+            int porcentajeActual = Integer.parseInt(labelPorcentajeAmarilla.getText().replace("%", ""));
+            if (porcentajeActual < 100 && acciones >= 4) {
+                int nuevoPorcentaje = porcentajeActual + 25;
+                if (nuevoPorcentaje > 100) {
+                    nuevoPorcentaje = 100;
+                }
+                vacunasArraylist.get(2).setPorcentage(nuevoPorcentaje);
+                acciones = 0; // Gastar todas las acciones
+                labelAcciones.setText("Acciones: " + acciones);
+                labelPorcentajeAmarilla.setText(nuevoPorcentaje + "%");
 
-        // Etiqueta para mostrar el contador de turnos
-        JLabel turnsLabel = new JLabel("Turno: " + turnos);
-        turnsLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        turnsLabel.setForeground(Color.BLACK); // Cambiar color a negro
-        turnsLabel.setBounds(10, 1010, 100, 30); // Posición de la etiqueta en la esquina inferior izquierda
-        layeredPane.add(turnsLabel, new Integer(5));
-
-        // Botón para finalizar el turno
-        JButton endTurnButton = new JButton("Finalizar Turno");
-        endTurnButton.setPreferredSize(new Dimension(150, 30));
-        endTurnButton.setFont(new Font("Arial", Font.BOLD, 12));
-        endTurnButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Incrementar el contador de turnos y actualizar la etiqueta
-                turnos++;
-                turnsLabel.setText("Turno: " + turnos);
-
-                // Reiniciar el contador de puntos de acción
-                puntosDeAccion = 4;
-                updatePointsLabel(); // Actualizar la etiqueta de puntos de acción
-
-                investigando = false; // Terminar la investigación al finalizar el turno
-                // Habilitar los botones de vacuna
-                vaccineButton1.setEnabled(true);
-                vaccineButton2.setEnabled(true);
-                vaccineButton3.setEnabled(true);
-                vaccineButton4.setEnabled(true);
+                // Verificar si todas las vacunas están al 100%
+                boolean todasVacunasCompletas = true;
+                for (Vacunas vacuna : vacunasArraylist) {
+                    if (vacuna.getPorcentage() < 100) {
+                        todasVacunasCompletas = false;
+                        break;
+                    }
+                }
+                if (todasVacunasCompletas) {
+                  
+                    dispose(); // Cerrar la ventana actual
+                    PantallaGanador pantallaGanador = new PantallaGanador();
+                    pantallaGanador.setVisible(true);
+                }
             }
         });
-        endTurnButton.setBounds((1920 - 150) / 2, 1040, 150, 30); // Posición del botón en la parte inferior central
-        layeredPane.add(endTurnButton, new Integer(6));
+        panelIzquierdo.add(botonVacunaAmarilla);
+        panelIzquierdo.add(labelPorcentajeAmarilla);
 
+        // Botón Vacuna Verde
+        ImageIcon vacunaVerdeIcon = new ImageIcon("vacuna4.png");
+        Image vacunaVerdeOriginal = vacunaVerdeIcon.getImage();
+        Image vacunaVerdeScaled = vacunaVerdeOriginal.getScaledInstance(150, -1, Image.SCALE_SMOOTH);
+        JButton botonVacunaVerde = new JButton(new ImageIcon(vacunaVerdeScaled));
+        JLabel labelPorcentajeVerde = new JLabel("0%");
+        botonVacunaVerde.addActionListener(e -> {
+            int porcentajeActual = Integer.parseInt(labelPorcentajeVerde.getText().replace("%", ""));
+            if (porcentajeActual < 100 && acciones >= 4) {
+                int nuevoPorcentaje = porcentajeActual + 25;
+                if (nuevoPorcentaje > 100) {
+                    nuevoPorcentaje = 100;
+                }
+                vacunasArraylist.get(3).setPorcentage(nuevoPorcentaje);
+                acciones = 0; // Gastar todas las acciones
+                labelAcciones.setText("Acciones: " + acciones);
+                labelPorcentajeVerde.setText(nuevoPorcentaje + "%");
+
+                // Verificar si todas las vacunas están al 100%
+                boolean todasVacunasCompletas = true;
+                for (Vacunas vacuna : vacunasArraylist) {
+                    if (vacuna.getPorcentage() < 100) {
+                        todasVacunasCompletas = false;
+                        break;
+                    }
+                }
+                if (todasVacunasCompletas) {
+                	dispose(); // Cerrar la ventana actual
+                    PantallaGanador pantallaGanador = new PantallaGanador();
+                    pantallaGanador.setVisible(true);
+                }
+            }
+        });
+        panelIzquierdo.add(botonVacunaVerde);
+        panelIzquierdo.add(labelPorcentajeVerde);
+        panelIzquierdo.add(new JLabel()); // Espacio en blanco
+        panelIzquierdo.add(new JLabel());
+        
+     // Botones de Curar
+        JButton botonCurar = new JButton("Curar");
+        
+        botonCurar.addActionListener(e -> {
+            // Verificar si hay una ciudad seleccionada y si hay acciones disponibles
+            if (ciudadSeleccionado != null && acciones > 0) {
+                // Encontrar la ciudad seleccionada en la lista de ciudades
+                int indiceCiudadSeleccionada = botonesCiudades.indexOf(ciudadSeleccionado);
+
+                // Verificar que el índice sea válido
+                if (indiceCiudadSeleccionada != -1) {
+                    Ciudades ciudadSeleccionada = ciudadesArraylist.get(indiceCiudadSeleccionada);
+
+                    // Verificar si la infección de la ciudad no está en 0
+                    if (ciudadSeleccionada.getInfeccion() > 0) {
+                        // Reducir la infección de la ciudad seleccionada en 1
+                        ciudadSeleccionada.disminuirInfeccion(1);
+
+                        // Reducir un punto de acción
+                        acciones--;
+
+                        // Actualizar la etiqueta de infección de la ciudad seleccionada
+                        labelInfeccionCiudad.setText("Infeccion Ciudad: " + ciudadSeleccionada.getInfeccion());
+
+                        // Actualizar la etiqueta de acciones
+                        labelAcciones.setText("Acciones: " + acciones);
+                        
+
+                        // Si la infección llega a 0, restaurar el color original del botón de la ciudad
+                        if (ciudadSeleccionada.getInfeccion() == 0) {
+                            ciudadSeleccionado.setBackground(ciudadSeleccionada.getColorOriginal());
+                            ciudadSeleccionado.setForeground(Color.black);
+                        }
+                    }
+                }
+            }
+        });
+
+        ImageIcon imagenBotonCurar = new ImageIcon("curar.png");
+        Image imagenOriginal = imagenBotonCurar.getImage();
+
+     // Escalar la imagen al tamaño del botón
+     Image imagenEscalada = imagenOriginal.getScaledInstance(150, 150, Image.SCALE_SMOOTH); 
+
+     // Crear un nuevo ImageIcon con la imagen escalada
+     ImageIcon imagenEscaladaIcon = new ImageIcon(imagenEscalada);
+
+     // Establecer la imagen escalada como icono del botón
+     botonCurar.setIcon(imagenEscaladaIcon);
+
+     // Establecer el tamaño y la posición del botón
+     botonCurar.setBounds(40, 568, 150, 150); // Tamaño del botón
+
+     // Agregar el botón al panel central
+     panelCentral.add(botonCurar);
+      
+        
+        // Agregar paneles al marco
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(panelCentral, BorderLayout.CENTER);
+        getContentPane().add(panelIzquierdo, BorderLayout.WEST);
+        getContentPane().add(panelDerecho, BorderLayout.EAST);
+       
+
+        setLocationRelativeTo(null); // Centrar la ventana en la pantalla
         setVisible(true);
-    }
+    
+        //Crear Botones  y array ciudades :=)
+        
+  
+        ciudadesArraylist = txtCiudades.crearArrayCiudades();
+        
+        
+     // Panel para los botones de las ciudades
+        
+        
+       System.out.println(ciudadesArraylist.size());
+        
+        for (Ciudades ciudad : ciudadesArraylist) {
+            int x = ciudad.getCoords()[0];
+            int y = ciudad.getCoords()[1];
 
-    private void updatePointsLabel() {
-        pointsLabel.setText("Puntos de Acción: " + puntosDeAccion);
+            JButton botonCiudad = new JButton(ciudad.getNombreciudad());
+            botonCiudad.setBounds(x, y, 100, 25); // Establecer el tamaño y la posición del botón
+            panelCentral.add(botonCiudad);
+            botonesCiudades.add(botonCiudad);
+            
+           
+            botonCiudad.setBackground(Color.GREEN); // Cambiar color de boton
+            botonCiudad.setOpaque(true);
+            botonCiudad.setBorderPainted(true);
+            botonCiudad.addActionListener(e -> {
+               ciudadSeleccionado = botonCiudad;
+               int posicionCiudad = -1;
+               for (int i = 0; i < botonesCiudades.size(); i++) {
+				if (botonCiudad == botonesCiudades.get(i)) {
+					posicionCiudad = i;
+				}
+			}
+               
+            	labelCiudadSelec.setText("Ciudad Seleccionada: " + ciudadesArraylist.get(posicionCiudad).getNombreciudad());
+            	labelInfeccionCiudad.setText("Infeccion Ciudad: " + ciudadesArraylist.get(posicionCiudad).getInfeccion());
+                });
+        }
+        
+        
+        //crear vacuna
+        
+        crearVacunas();
+        parametros.LeerYPrintear();
+        infectarInicio();    
+        }
+    
+    private void crearVacunas() {
+		Vacunas rojo = new Vacunas("vacuna1", "Alfa", 0);
+		Vacunas azul = new Vacunas("vacuna2", "Beta", 0);
+		Vacunas amarilla = new Vacunas("vacuna3", "Gama", 0);
+		Vacunas verde = new Vacunas("vacuna4", "Delta", 0);
+		
+		vacunasArraylist.add(rojo);
+		vacunasArraylist.add(azul);
+		vacunasArraylist.add(amarilla);
+		vacunasArraylist.add(verde);
+		
+	}
+    
+    private int generarPorcentaje() {
+        Random random = new Random();
+        return random.nextInt(101); // Porcentaje aleatorio entre 0 y 100
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new PantallaJuego();
-            }
-        });
+        SwingUtilities.invokeLater(PantallaJuego::new);
     }
+    
+    public void infectarInicio() {
+    	
+   
+    	 for (int i = 0; i < ciudadesArraylist.size(); i++) {
+    	        Ciudades ciudad = ciudadesArraylist.get(i);
+    	        switch (ciudad.getVirus()) {
+    	            case 0:
+    	                botonesCiudades.get(i).setBackground(Color.BLUE);
+    	                break;
+    	            case 1:
+    	                botonesCiudades.get(i).setBackground(Color.RED);
+    	                break;
+    	            case 2:
+    	                botonesCiudades.get(i).setBackground(Color.YELLOW);
+    	                break;
+    	            case 3:
+    	                botonesCiudades.get(i).setBackground(Color.GREEN);
+    	                break;
+    	            default:
+    	                break;
+    	        }
+    	    
+    	        // Almacenar el color original del botón en la ciudad
+    	        ciudad.setColorOriginal(botonesCiudades.get(i).getBackground());
+    	    }
+    
+    	
+    	for (int i = 0; i < parametros.numCiudadesInfectadasInicio; i++) {
+             Random random = new Random();
+			int ciudadesRandom = random.nextInt(ciudadesArraylist.size());
+             ciudadesArraylist.get(ciudadesRandom).aumentarinfeccion(1);
+    	
+             botonesCiudades.get(ciudadesRandom).setBackground(Color.DARK_GRAY);
+             botonesCiudades.get(ciudadesRandom).setForeground(Color.white);
+             
+    	}
+    
+    }
+    
+ 
+    	
+    
+    
+    public void brote(Ciudades ciudad) {
+        for (String nombreColindante : ciudad.getColindantes()) { // Iterar sobre los nombres de las ciudades colindantes
+            // Buscar la ciudad colindante por su nombre
+            for (int j = 0; j < ciudadesArraylist.size(); j++) {
+                Ciudades ciudadEnLista = ciudadesArraylist.get(j);
+                if (nombreColindante.equals(ciudadEnLista.getNombreciudad())) { // Comparar nombres de ciudad
+                    ciudadEnLista.aumentarinfeccion(1);
+                    int indiceBoton = botonesCiudades.indexOf(ciudadEnLista.getNombreciudad());
+                    if (indiceBoton != -1) {
+                        botonesCiudades.get(indiceBoton).setBackground(Color.DARK_GRAY);
+                        botonesCiudades.get(indiceBoton).setForeground(Color.WHITE);
+                    }
+                    break; // Salir del bucle una vez que se haya encontrado la ciudad colindante
+                }
+            }
+        }
+    }
+
+
+
+
+    
+    public void nuevoTurno() {
+        for (int i = 0; i < 5; i++) {
+            Random random = new Random();
+            int ciudadRandom = random.nextInt(ciudadesArraylist.size());
+            Ciudades ciudadActual = ciudadesArraylist.get(ciudadRandom);
+
+            // Verificar si la ciudad está en infección 3
+            if (ciudadActual.getInfeccion() < 3) {
+                ciudadActual.aumentarinfeccion(1);
+
+                // Si la ciudad ya tiene una infección, siempre aumentar una infección más
+                if (ciudadActual.getInfeccion() == 1) {
+                    ciudadActual.aumentarinfeccion(1);
+                }
+
+                // Actualizar la apariencia del botón de la ciudad
+                botonesCiudades.get(ciudadRandom).setBackground(Color.DARK_GRAY);
+                botonesCiudades.get(ciudadRandom).setForeground(Color.white);
+            }
+        }
+
+       
+    }
+
+    
 }
+
+
